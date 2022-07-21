@@ -1,15 +1,13 @@
 pluginManagement {
   repositories {
     mavenLocal()
-    maven((extra.properties["artifactory_contextUrl"] as String) + "/gradle") {
-      credentials {
-        username = extra.properties["artifactory_user"] as String
-        password = extra.properties["artifactory_password"] as String
-      }
-    }
+    gradlePluginPortal()
+    maven("https://hypertrace.jfrog.io/artifactory/maven")
   }
 }
 
 plugins {
   id("org.hypertrace.version-settings") version "0.2.0"
 }
+
+rootProject.name = "db-schema-manager-root"
