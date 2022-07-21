@@ -1,0 +1,81 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    {{- toYaml .Values.annotations | nindent 4}}
+  labels:
+    app: {{ .Values.jobName }}
+    release: {{ .Release.Name }}
+  name: {{ .Values.jobName }}
+spec:
+  activeDeadlineSeconds: {{ int .Values.activeDeadlineSeconds }}
+  backoffLimit: 100
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end}}
+      labels:
+        app: {{ .Values.jobName }}
+        release: {{ .Release.Name }}
+      {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      containers:
+        - name: db-schema-manager
+          image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/opt/liquibase/liquibase"
+            - "--url"
+            - {{ .Values.database.url | quote }}
+            - "--changeLogFile"
+            - {{ .Values.changeLogFile | quote }}
+            - "--username"
+            - {{ .Values.database.username | quote }}
+            - "--password"
+            - "$(DATABASE_PASSWORD)"
+            - "update"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.passwordSecretName }}
+                  key: {{ .Values.database.passwordSecretKey }}
+          {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: changelogs
+              mountPath: /etc/liquibase/changelogs
+              readOnly: true
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: OnFailure
+      {{- with .Values.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: changelogs
+          configMap:
+            name: {{ .Values.jobName }}
+  ttlSecondsAfterFinished: {{ int .Values.ttlSecondsAfterFinished }}

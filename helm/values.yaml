@@ -1,0 +1,41 @@
+image:
+  repository: hypertrace/liquibase
+  tag: ""
+  pullPolicy: IfNotPresent
+
+jobName: db-schema-manager
+
+changeLogFile: "to be provided"
+
+database:
+  url: "jdbc:postgresql://postgresql:5432/hypertrace"
+  username: hypertrace
+  passwordSecretName: postgresql-postgresql
+  passwordSecretKey: postgresql-password
+
+annotations:
+  "helm.sh/hook": pre-install,pre-upgrade
+  "helm.sh/hook-weight": "10"
+  "helm.sh/hook-delete-policy": before-hook-creation
+
+podLabels: {}
+
+podAnnotations: {}
+
+imagePullSecrets: []
+
+resources: {}
+
+env: []
+
+nodeSelector: {}
+
+affinity: {}
+
+tolerations: {}
+
+securityContext: {}
+
+activeDeadlineSeconds: 600
+
+ttlSecondsAfterFinished: 900
