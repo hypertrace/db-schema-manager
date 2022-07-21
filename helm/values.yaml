@@ -3,7 +3,7 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
-jobName: database-schema
+jobName: db-schema-manager
 
 changeLogFile: "to be provided"
 

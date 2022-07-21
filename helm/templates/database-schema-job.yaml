@@ -24,7 +24,7 @@ spec:
       {{- end }}
     spec:
       containers:
-        - name: database-schema
+        - name: db-schema-manager
           image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
