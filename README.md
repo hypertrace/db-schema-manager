@@ -9,7 +9,7 @@ Make the following changes in the application helm chart:
     dependencies:
       - name: db-schema-manager
         repository: https://storage.googleapis.com/hypertrace-helm-charts
-        version: 0.1.1
+        version: 0.1.2
         condition: db-schema-manager.enabled
    ```
 
