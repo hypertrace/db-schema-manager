@@ -7,7 +7,8 @@ RUN apt update && \
     apt install curl -y && \
     mkdir /opt/liquibase && \
     cd /opt/liquibase && \
-    curl -L https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz | tar -xzf-
+    curl -L https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz | tar -xzf- && \
+    rm -rf /var/lib/apt/lists/*
 
 # fix for CVE-2022-41853
 # remove it after hsqldb library version is upgraded in liquibase
