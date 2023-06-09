@@ -28,16 +28,13 @@ spec:
           image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - "/opt/liquibase/liquibase"
-            - "--url"
-            - {{ .Values.database.url | quote }}
-            - "--changeLogFile"
-            - {{ .Values.changeLogFile | quote }}
-            - "--username"
-            - {{ .Values.database.username | quote }}
-            - "--password"
-            - "$(DATABASE_PASSWORD)"
-            - "update"
+            - /bin/sh
+            - -c
+            - |
+              if [ "$CLEAR_CHECKSUMS" = "true" ]; then
+                /opt/liquibase/liquibase --url {{ .Values.database.url | quote }} --changeLogFile {{ .Values.changeLogFile | quote }} --username {{ .Values.database.username | quote }} --password "$DATABASE_PASSWORD" clear-checksums
+              fi
+              /opt/liquibase/liquibase --url {{ .Values.database.url | quote }} --changeLogFile {{ .Values.changeLogFile | quote }} --username {{ .Values.database.username | quote }} --password "$DATABASE_PASSWORD" update
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
@@ -46,6 +43,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.database.passwordSecretName }}
                   key: {{ .Values.database.passwordSecretKey }}
+            - name: CLEAR_CHECKSUMS
+              value: {{ .Values.clearChecksums | quote }}
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
